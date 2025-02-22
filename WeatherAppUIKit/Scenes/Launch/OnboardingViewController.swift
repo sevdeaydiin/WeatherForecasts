@@ -12,14 +12,12 @@ class OnboardingViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupGradientBackground()
         setupUI()
     }
     
     private func setupUI() {
-        //view.backgroundColor = UIColor(named: "sun")?.withAlphaComponent(0.2)
-        
+
         let cloudIcon = UIImageView(image: UIImage(named: "cloud"))
         view.addSubview(cloudIcon)
         
@@ -57,6 +55,7 @@ class OnboardingViewController: UIViewController {
         getStartButton.backgroundColor = UIColor(named: "sun")
         getStartButton.setTitleColor(.black, for: .normal)
         getStartButton.layer.cornerRadius = 30
+        getStartButton.addTarget(self, action: #selector(getStartButtonTapped), for: .touchUpInside)
         view.addSubview(getStartButton)
         
         getStartButton.snp.makeConstraints { make in
@@ -64,6 +63,23 @@ class OnboardingViewController: UIViewController {
             make.centerX.equalToSuperview()
             make.width.equalTo(300)
             make.height.equalTo(60)
+        }
+    }
+    
+    @objc private func getStartButtonTapped() {
+        UserDefaultsManager.shared.isFirstLaunch = false
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        if let mainVC = storyboard.instantiateInitialViewController() {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                window.rootViewController = mainVC
+                UIView.transition(with: window,
+                                duration: 0.3,
+                                options: .transitionCrossDissolve,
+                                animations: nil,
+                                completion: nil)
+            }
         }
     }
     
