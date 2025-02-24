@@ -7,13 +7,17 @@
 
 import UIKit
 import SnapKit
+import CoreLocation
 
 class OnboardingViewController: UIViewController {
 
+    private let locationManager = CLLocationManager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupGradientBackground()
         setupUI()
+        locationManager.delegate = self
     }
     
     private func setupUI() {
@@ -68,7 +72,14 @@ class OnboardingViewController: UIViewController {
     
     @objc private func getStartButtonTapped() {
         UserDefaultsManager.shared.isFirstLaunch = false
-        
+        requestLocationPermission()
+    }
+    
+    private func requestLocationPermission() {
+        locationManager.requestWhenInUseAuthorization()
+    }
+    
+    private func navigateToMainScreen() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         if let mainVC = storyboard.instantiateInitialViewController() {
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -93,6 +104,17 @@ class OnboardingViewController: UIViewController {
         gradientLayer.endPoint = CGPoint(x: 0.5, y: 1)
         gradientLayer.frame = view.bounds
         view.layer.insertSublayer(gradientLayer, at: 0)
+    }
+}
+
+extension OnboardingViewController: CLLocationManagerDelegate {
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        switch manager.authorizationStatus {
+        case .authorizedWhenInUse, .authorizedAlways, .denied, .restricted:
+            navigateToMainScreen()
+        default:
+            break
+        }
     }
 }
 
