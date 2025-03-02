@@ -25,12 +25,13 @@ struct Endpoint {
     let queryItems: [URLQueryItem]
     
     var url: URL? {
+        
         var components = URLComponents()
         components.scheme = "https"
         components.host = "api.openweathermap.org"
         components.path = "/data/2.5/\(path)"
         components.queryItems = [
-            URLQueryItem(name: "appid", value: APIConstants.apiKey),
+            URLQueryItem(name: "appid", value: Bundle.main.object(forInfoDictionaryKey: "WeatherAPIKey") as? String),
             URLQueryItem(name: "units", value: "metric")
         ] + queryItems
         
@@ -68,8 +69,4 @@ final class NetworkService: NetworkServiceProtocol {
             }
             .eraseToAnyPublisher()
     }
-}
-
-enum APIConstants {
-    static let apiKey = "API_KEY"
 }
